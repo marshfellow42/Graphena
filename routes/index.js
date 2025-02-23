@@ -6,6 +6,14 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Conversor de Arquivos' });
 });
 
+router.get("/profile/", function (req, res, next) {
+  res.render("auth/profile", { title: "Perfil" });
+});
+
+router.get("/history/", function (req, res, next) {
+  res.render("auth/history", { title: "Histórico", users });
+});
+
 router.get('/history/login', function(req, res, next) {
   res.render('auth/login-history', { title: 'Login' });
 });

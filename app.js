@@ -1,119 +1,108 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-const session = require('express-session');
-const argon2 = require('argon2');
-const bodyParser = require('body-parser');
-const { MongoClient, ObjectId } = require("mongodb");
-require("dotenv").config();
+var createError = require("http-errors");
+var express = require("express");
+var path = require("path");
+var cookieParser = require("cookie-parser");
+var logger = require("morgan");
+const session = require("express-session");
+const argon2 = require("argon2");
+const bodyParser = require("body-parser");
 
-const uri = process.env.URI;
-const client = new MongoClient(uri);
-const mydb_users = client.db("converter").collection("usuarios");
-const mydb_historico = client.db("converter").collection("historico");
-const contactsDAO = require("./contactsDAO");
-const api = require('./api');
-
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var indexRouter = require("./routes/index");
+var usersRouter = require("./routes/users");
+var allRouter = require("./routes/eloquent/all");
+var addRouter = require("./routes/eloquent/add");
+var delRouter = require("./routes/eloquent/delete");
+var updateRouter = require("./routes/eloquent/update");
 
 var app = express();
 
-app.use(api);
-
-app.listen(process.env.PORT, () => {
-  console.log("Servidor rodando...");
-});
-
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Session configuration
-app.use(session({
-  secret: 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(
+    session({
+        secret: "your-secret-key",
+        resave: false,
+        saveUninitialized: false,
+    })
+);
 
 const users = [
-  { id: 1, username: 'john', passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$48B13QWMXbFnmxsURneYbQ$s7CokIgyTuY8jCTPj/Qn+ST3Rk7EWIVGjvVRDr920VY' },
-  { id: 2, username: 'john2', passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$48B13QWMXbFnmxsURneYbQ$s7CokIgyTuY8jCTPj/Qn+ST3Rk7EWIVGjvVRDr920VY' }, // password: 'password123'
+    {
+        id: 1,
+        username: "john",
+        passwordHash:
+            "$argon2id$v=19$m=65536,t=3,p=4$48B13QWMXbFnmxsURneYbQ$s7CokIgyTuY8jCTPj/Qn+ST3Rk7EWIVGjvVRDr920VY",
+    },
+    {
+        id: 2,
+        username: "john2",
+        passwordHash:
+            "$argon2id$v=19$m=65536,t=3,p=4$48B13QWMXbFnmxsURneYbQ$s7CokIgyTuY8jCTPj/Qn+ST3Rk7EWIVGjvVRDr920VY",
+    }, // password: 'password123'
 ];
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-app.get('/profile/', function(req, res, next) {
-  res.render('auth/profile', { title: 'Perfil' });
-});
-
-app.get('/history/', function(req, res, next) {
-  res.render('auth/history', { title: 'Histórico', users });
-});
+app.use("/users", usersRouter);
+app.use("/all", allRouter);
+app.use("/add", addRouter);
+app.use("/del", delRouter);
+app.use("/update", updateRouter);
+app.use("/", indexRouter);
 
 // Login route (username and password authentication)
-app.post('/login/history', async (req, res) => {
-  const { username, password } = req.body;
+app.post("/login/history", async (req, res) => {
+    const { username, password } = req.body;
 
-  const user = users.find(u => u.username === username);
-  if (user && await argon2.verify(user.passwordHash, password)) {
-    // If password matches, save user to session
-    req.session.user = user;
-    return res.redirect('/history');
-  } else {
-    return res.status(401).send('Credenciais inválidas');
-  }
+    const user = users.find((u) => u.username === username);
+    if (user && (await argon2.verify(user.passwordHash, password))) {
+        // If password matches, save user to session
+        req.session.user = user;
+        return res.redirect("/history");
+    } else {
+        return res.status(401).send("Credenciais inválidas");
+    }
 });
 
-app.post('/login/profile', async (req, res) => {
-  const { username, password } = req.body;
+app.post("/login/profile", async (req, res) => {
+    const { username, password } = req.body;
 
-  const user = users.find(u => u.username === username);
-  if (user && await argon2.verify(user.passwordHash, password)) {
-    // If password matches, save user to session
-    req.session.user = user;
-    return res.redirect('/profile');
-  } else {
-    return res.status(401).send('Credenciais inválidas');
-  }
+    const user = users.find((u) => u.username === username);
+    if (user && (await argon2.verify(user.passwordHash, password))) {
+        // If password matches, save user to session
+        req.session.user = user;
+        return res.redirect("/profile");
+    } else {
+        return res.status(401).send("Credenciais inválidas");
+    }
 });
 
-app.post('/login/update', async (req, res) => {
-  return res.redirect('/');
+app.post("/login/update", async (req, res) => {
+    return res.redirect("/");
 });
-
-app.get("/*", function (req, res) {
-  res.status(404).json({
-      err: "Link não encontrado",
-  });
-});
-
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.title = "Error " + err.status;
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.title = "Error " + err.status;
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render("error");
 });
 
 module.exports = app;
