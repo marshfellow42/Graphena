@@ -15,6 +15,7 @@ O site consiste no Trabalho Final da disciplina de Programação Web I, do profe
 
 ### Tutorial de Execução
 - Caso não tenha, instale o Node.js clicando [aqui](https://nodejs.org/en/download);
+- Também baixe o Python na sua máquina para isso;
 - Baixe esse repositório, ou clonando pelo Git, ou como um zip;
 - Pelo terminal, entre na pasta raíz do projeto, (onde se localiza o `package.json`);
 - No terminal, execute ``npm install`` para baixar as dependências;
