@@ -13,6 +13,8 @@ var allRouter = require("./routes/eloquent/all");
 var addRouter = require("./routes/eloquent/add");
 var delRouter = require("./routes/eloquent/delete");
 var updateRouter = require("./routes/eloquent/update");
+var convertRouter = require("./routes/eloquent/convert");
+var loginRouter = require("./routes/eloquent/login");
 
 var app = express();
 
@@ -35,58 +37,14 @@ app.use(
     })
 );
 
-const users = [
-    {
-        id: 1,
-        username: "john",
-        passwordHash:
-            "$argon2id$v=19$m=65536,t=3,p=4$48B13QWMXbFnmxsURneYbQ$s7CokIgyTuY8jCTPj/Qn+ST3Rk7EWIVGjvVRDr920VY",
-    },
-    {
-        id: 2,
-        username: "john2",
-        passwordHash:
-            "$argon2id$v=19$m=65536,t=3,p=4$48B13QWMXbFnmxsURneYbQ$s7CokIgyTuY8jCTPj/Qn+ST3Rk7EWIVGjvVRDr920VY",
-    }, // password: 'password123'
-];
-
 app.use("/users", usersRouter);
 app.use("/all", allRouter);
 app.use("/add", addRouter);
 app.use("/del", delRouter);
 app.use("/update", updateRouter);
+app.use("/convert", convertRouter);
+app.use("/login", loginRouter);
 app.use("/", indexRouter);
-
-// Login route (username and password authentication)
-app.post("/login/history", async (req, res) => {
-    const { username, password } = req.body;
-
-    const user = users.find((u) => u.username === username);
-    if (user && (await argon2.verify(user.passwordHash, password))) {
-        // If password matches, save user to session
-        req.session.user = user;
-        return res.redirect("/history");
-    } else {
-        return res.status(401).send("Credenciais inválidas");
-    }
-});
-
-app.post("/login/profile", async (req, res) => {
-    const { username, password } = req.body;
-
-    const user = users.find((u) => u.username === username);
-    if (user && (await argon2.verify(user.passwordHash, password))) {
-        // If password matches, save user to session
-        req.session.user = user;
-        return res.redirect("/profile");
-    } else {
-        return res.status(401).send("Credenciais inválidas");
-    }
-});
-
-app.post("/login/update", async (req, res) => {
-    return res.redirect("/");
-});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

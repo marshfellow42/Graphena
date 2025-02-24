@@ -22,8 +22,8 @@ router.get('/profile/login', function(req, res, next) {
   res.render('auth/login-profile', { title: 'Login' });
 });
 
-router.get('/svg-to-png', function(req, res, next) {
-  res.render('convert/svg-to-png', { title: 'SVG para PNG' });
+router.get('/mp4-to-gif', function(req, res, next) {
+  res.render('convert/mp4-to-gif', { title: 'MP4 para GIF' });
 });
 
 router.get('/pdf-to-png', function(req, res, next) {
