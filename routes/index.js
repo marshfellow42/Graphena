@@ -22,12 +22,12 @@ router.get('/profile/login', function(req, res, next) {
   res.render('auth/login-profile', { title: 'Login' });
 });
 
-router.get('/mp4-to-gif', function(req, res, next) {
-  res.render('convert/mp4-to-gif', { title: 'MP4 para GIF' });
+router.get('/mp4-para-gif', function(req, res, next) {
+  res.render('convert/mp4-para-gif', { title: 'MP4 para GIF' });
 });
 
-router.get('/pdf-to-png', function(req, res, next) {
-  res.render('convert/pdf-to-png', { title: 'PDF para PNG' });
+router.get('/pdf-para-png', function(req, res, next) {
+  res.render('convert/pdf-para-png', { title: 'PDF para PNG' });
 });
 
 module.exports = router;
