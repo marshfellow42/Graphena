@@ -7,10 +7,12 @@ const { ObjectId } = require("mongodb");
 // History route
 router.post("/history", async (req, res) => {
     const { username, password } = req.body;
+    console.log("username: " + username)
+    console.log("password: " + password)
 
     try {
         const user = await mydb_users.findOne({ username });
-        if (user && (await argon2.verify(user.passwordHash, password))) {
+        if (user && (await argon2.verify(user.senha, password))) {
             req.session.user = user;
             return res.redirect("/history");
         } else {

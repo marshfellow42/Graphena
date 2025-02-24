@@ -23,26 +23,42 @@
     <table class="table table-striped nowrap" style="width: 100%" id="myTable">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Apelido</th>
-                <th>Senha</th>
+                <th>Nome</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
-            <% users.forEach(user => { %>
-                <tr>
-                    <td><%= user.id %></td>
-                    <td><%= user.username %></td>
-                    <td><%= user.passwordHash %></td>
-                    <td>
-                        <form action="/users/delete/<%= user.id %>" method="POST" style="display: inline">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">
-                                <i class="bi bi-trash-fill"></i> Excluir
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+            <% history.forEach(historico => { %>
+            <tr>
+                <td><%= historico.filename %></td>
+                <td>
+                    <!-- Download Button -->
+                    <form
+                        action="/download/history/<%= historico.filename %>"
+                        method="GET"
+                        style="display: inline"
+                    >
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                    </form>
+                    <!--
+                    <form
+                        action="/delete/history/<%= historico._id %>"
+                        method="POST"
+                        style="display: inline"
+                    >
+                        <button
+                            type="submit"
+                            class="btn btn-sm btn-danger"
+                            onclick="return confirm('Tem certeza que deseja excluir este documento?');"
+                        >
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </form>
+                    -->
+                </td>
+            </tr>
             <% }); %>
         </tbody>
     </table>

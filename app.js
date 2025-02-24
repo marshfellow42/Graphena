@@ -15,6 +15,7 @@ var delRouter = require("./routes/eloquent/delete");
 var updateRouter = require("./routes/eloquent/update");
 var convertRouter = require("./routes/eloquent/convert");
 var loginRouter = require("./routes/eloquent/login");
+var downloadRouter = require("./routes/eloquent/download");
 
 var app = express();
 
@@ -34,6 +35,9 @@ app.use(
         secret: "your-secret-key",
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            maxAge: 15778464000, // 6 meses
+        },
     })
 );
 
@@ -44,6 +48,7 @@ app.use("/del", delRouter);
 app.use("/update", updateRouter);
 app.use("/convert", convertRouter);
 app.use("/login", loginRouter);
+app.use("/download", downloadRouter);
 app.use("/", indexRouter);
 
 // catch 404 and forward to error handler
