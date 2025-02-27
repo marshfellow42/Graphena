@@ -14,7 +14,7 @@ router.post("/history", async (req, res) => {
         const user = await mydb_users.findOne({ username });
         if (user && (await argon2.verify(user.senha, password))) {
             req.session.user = user;
-            return res.redirect("/history");
+            return res.redirect("/pdf-para-png");
         } else {
             return res.status(401).send("Credenciais inválidas");
         }

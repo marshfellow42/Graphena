@@ -26,17 +26,21 @@
             class="dropdown-menu dropdown-menu-end"
             aria-labelledby="navbarDropdown"
         >
-            <li><a class="dropdown-item" href="/profile/login">Perfil</a></li>
-            <li>
-                <hr class="dropdown-divider" />
-            </li>
-            <li>
-                <a class="dropdown-item" href="/history/login">Histórico</a>
-            </li>
-            <li>
-                <hr class="dropdown-divider" />
-            </li>
-            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            <% if(user){ %>
+                <li><a class="dropdown-item" href="/history/">Histórico</a></li>
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            <% } else { %>  
+                <li><a class="dropdown-item" href="/history/login">Login</a></li>
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" href="/create-account">Criar conta</a></li>
+            <% } %>
+        
+
         </ul>
     </div>
 </div>

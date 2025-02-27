@@ -26,33 +26,65 @@ router.get("/profile/", function (req, res, next) {
 });
 
 router.get("/history", async (req, res, next) => {
-    try {
-      const historico = await mydb_historico.find({}).toArray();
-      res.render("auth/history", {
-        title: "Histórico",
-        history: historico, // Pass users directly to the template
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Erro ao buscar dados do histórico");
+    // Check if the user is logged in and if linked_user is present in the session
+    if (!req.session || !req.session.user || !req.session.user._id) {
+        return res.status(401).send("Usuário não vinculado ou não autenticado.");
     }
-  });
 
-
-router.get("/history/login", function (req, res, next) {
-    res.render("auth/login-history", { title: "Login" });
+    try {
+        // Filter records by linked_user
+        const historico = await mydb_historico.find({ linked_user: req.session.user._id }).toArray();
+        
+        res.render("auth/history", {
+            title: "Histórico",
+            history: historico, // Pass the filtered history to the template
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erro ao buscar dados do histórico");
+    }
 });
+
+
+
+  router.get("/history/login", function (req, res, next) {
+    if (req.session && req.session.user) {
+        res.redirect("/history");
+    } else {
+        res.render("auth/login-history", { title: "Login" });
+    }
+});
+
 
 router.get("/profile/login", function (req, res, next) {
     res.render("auth/login-profile", { title: "Login" });
 });
 
 router.get("/mp4-para-gif", function (req, res, next) {
-    res.render("convert/mp4-para-gif", { title: "MP4 para GIF" });
+    if (req.session && req.session.user) {
+        user = true        
+    } else {
+        user = false
+    }
+    res.render("convert/mp4-para-gif", { title: "MP4 para GIF", login: user });
 });
 
 router.get("/pdf-para-png", function (req, res, next) {
-    res.render("convert/pdf-para-png", { title: "PDF para PNG" });
+    if (req.session && req.session.user) {
+        user = true        
+    } else {
+        user = false
+    }
+    res.render("convert/pdf-para-png", { title: "PDF para PNG", login: user });
+});
+
+router.get("/create-account", function (req, res, next) {
+    res.render("auth/create-account", { title: "Criar conta" });
+});
+
+router.get("/logout", function (req, res, next) {
+    req.session.destroy();
+    res.redirect("/pdf-para-png");
 });
 
 module.exports = router;

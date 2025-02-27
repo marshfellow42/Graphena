@@ -10,9 +10,9 @@ const axios = require("axios"); // For internal API calls to log history
 const upload = multer({ dest: "uploads/" });
 
 // Helper function to log conversion history
-async function logConversionHistory(filename, tipo) {
+async function logConversionHistory(linked_user, filename, tipo) {
     try {
-        await axios.get(`http://localhost:3000/add/history/${filename}/${tipo}`);
+        await axios.get(`http://localhost:3000/add/history/${linked_user}/${filename}/${tipo}`);
     } catch (error) {
         console.error("Erro ao registrar histórico:", error.message);
     }
@@ -43,7 +43,15 @@ router.post("/pdf-para-png", upload.single("file"), async (req, res) => {
             console.log(`Arquivo enviado com sucesso: ${zipPath}`);
 
             // Log history
-            await logConversionHistory(zipFileName, "pdf-para-png");
+            if (req.session && req.session.user) {
+                try {
+                    // Log the conversion history with the user's _id and file information
+                    await logConversionHistory(req.session.user._id, zipFileName, "pdf-para-png");
+                } catch (logError) {
+                    // Catch any errors that occur while logging the history
+                    console.error(`Erro ao registrar histórico de conversão: ${logError.message}`);
+                }
+            }            
 
             try {
                 fs.rmSync(filePath); // Clean up uploaded file
@@ -77,8 +85,16 @@ router.post("/mp4-para-gif", upload.single("file"), async (req, res) => {
 
             console.log(`Arquivo enviado com sucesso: ${gifPath}`);
 
-            // Log history
-            await logConversionHistory(gifFileName, "mp4-para-gif");
+            if (req.session && req.session.user) {
+                try {
+                    // Log the conversion history with the user's _id and file information
+                    await logConversionHistory(req.session.user._id, gifFileName, "mp4-para-gif");
+                } catch (logError) {
+                    // Catch any errors that occur while logging the history
+                    console.error(`Erro ao registrar histórico de conversão: ${logError.message}`);
+                }
+            }
+            
 
             try {
                 fs.rmSync(filePath); // Clean up uploaded file
